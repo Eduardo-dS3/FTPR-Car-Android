@@ -51,6 +51,13 @@ class LoginActivity : AppCompatActivity() {
 
     private fun onVerifyCode() {
         val verificationCode = binding.veryfyCode.text.toString()
+
+        //Verifica se o usuário informou algum código para validar
+        if (verificationCode.isEmpty()) {
+            Toast.makeText(this, R.string.resquest_code, Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val credential = PhoneAuthProvider.getCredential(verificationId, verificationCode)
         FirebaseAuth.getInstance().signInWithCredential(credential)
             .addOnFailureListener {
@@ -64,6 +71,13 @@ class LoginActivity : AppCompatActivity() {
 
     private fun onSendVerificationCode() {
         val phoneNumber = binding.cellphone.text.toString()
+
+        //Valida se o usuário informou o número de telefone
+        if (phoneNumber.isEmpty()) {
+            Toast.makeText(this, R.string.resquest_number, Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val auth = FirebaseAuth.getInstance()
         val options = PhoneAuthOptions.newBuilder(auth)
             .setPhoneNumber(phoneNumber)

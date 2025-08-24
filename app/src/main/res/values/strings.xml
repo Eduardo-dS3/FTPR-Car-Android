@@ -3,4 +3,7 @@
     <string name="error_login_verification">Erro ao verificar o código SMS</string>
     <string name="error_login">Erro ao fazer login</string>
     <string name="success_login_sent">Código enviado por SMS</string>
+    <string name="exit">Sair</string>
+    <string name="resquest_code">Informe o código de verificação</string>
+    <string name="resquest_number">Informe o número do telefone</string>
 </resources>
