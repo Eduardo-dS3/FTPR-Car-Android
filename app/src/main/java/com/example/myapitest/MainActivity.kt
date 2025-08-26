@@ -16,7 +16,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myapitest.adapter.CarAdapter
 import com.example.myapitest.databinding.ActivityMainBinding
+import com.example.myapitest.service.RetrofitClient
+import com.example.myapitest.service.safeApiCall
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
@@ -24,6 +28,8 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.example.myapitest.service.Result
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,6 +59,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupView() {
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = true
+            fetchItems()
+        }
 
         binding.logoutCta.setOnClickListener{
             onLogout()
@@ -134,7 +146,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchItems() {
-        // TODO
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall {
+                RetrofitClient.apiService.getCars()
+            }
+            withContext(Dispatchers.Main) {
+                binding.swipeRefreshLayout.isRefreshing = false
+                when(result) {
+                    is Result.Success -> {
+                        val adapter = CarAdapter(result.data) { item ->
+                            startActivity(CarDetailActivity.newIntent(this@MainActivity, item.id))
+                        }
+                        binding.recyclerView.adapter = adapter
+                    }
+                    is Result.Error -> {
+                        Toast.makeText(this@MainActivity,
+                            getString(R.string.erro_ao_buscar_carros), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun navigateToNewCar(){

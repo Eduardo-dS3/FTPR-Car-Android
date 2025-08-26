@@ -16,4 +16,5 @@
     <string name="error_validate_license_format">A placa deve estar no formato ABC-1234</string>
     <string name="erro_create">Erro ao salvar item</string>
     <string name="success_create">Item %1$s adicionado com sucesso!</string>
+    <string name="erro_ao_buscar_carros">Erro ao buscar carros</string>
 </resources>
