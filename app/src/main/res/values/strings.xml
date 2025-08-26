@@ -8,4 +8,6 @@
     <string name="resquest_number">Informe o número do telefone</string>
     <string name="erro_desconhecido">Erro desconhecido</string>
     <string name="permissao_de_localizacao_negada">Permissão de localização negada</string>
+    <string name="error_camera_permission">Permissão de câmera não concedida</string>
+    <string name="error_upload_image">Erro ao realizar o upload da imagem</string>
 </resources>
