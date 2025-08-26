@@ -21,6 +21,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import com.example.myapitest.databinding.ActivityNewCarBinding
+import com.example.myapitest.model.Car
+import com.example.myapitest.model.Place
+import com.example.myapitest.service.RetrofitClient
+import com.example.myapitest.service.safeApiCall
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -31,11 +35,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
+import com.example.myapitest.service.Result
 
 class NewCarActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -107,6 +117,106 @@ class NewCarActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.takePictureCta.setOnClickListener {
             onTakePicture()
         }
+        binding.saveCta.setOnClickListener {
+            saveCar()
+        }
+    }
+
+    private fun saveCar(){
+        if (!validateForm()) {
+            return
+        }
+
+        saveData()
+    }
+
+    private fun saveData() {
+        val location = selectedMarker?.position?.let { position ->
+            Place(
+                position.latitude,
+                position.longitude
+            )
+        } ?: throw IllegalArgumentException("Usuário deveria ter selecionado uma localização")
+
+        val id = SecureRandom().nextInt().toString()
+
+        val car = Car(
+            id = id,
+            name = binding.name.text.toString(),
+            year = binding.year.text.toString(),
+            licence = binding.licence.text.toString(),
+            imageUrl = binding.imageUrl.text.toString(),
+            place = location
+        )
+
+        CoroutineScope(Dispatchers.IO).launch {
+            var result = safeApiCall {
+                RetrofitClient.apiService.postCar(car)
+            }
+            withContext(Dispatchers.Main) {
+                when (result) {
+                    is Result.Success -> {
+                        Toast.makeText(
+                            this@NewCarActivity,
+                            getString(R.string.success_create, car.name),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    }
+
+                    is Result.Error -> {
+                        Toast.makeText(
+                            this@NewCarActivity,
+                            getString(R.string.erro_create),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateForm(): Boolean {
+        if (binding.name.text.toString().isBlank()) {
+            Toast.makeText(this, getString(R.string.error_validate_form, "Name"), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        val year = binding.year.text.toString()
+        if (year.isBlank()) {
+            Toast.makeText(this, getString(R.string.error_validate_form, "Year"), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        // Valida se está no formato "2020/2020"
+        if (year.length != 9 || year[4] != '/') {
+            Toast.makeText(this, getString(R.string.error_validate_year_format), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        // Pega as duas partes separadas pelo "/"
+        val parts = year.split("/")
+        if (parts.size != 2 || parts.any { it.length != 4 || !it.all { ch -> ch.isDigit() } }) {
+            Toast.makeText(this, getString(R.string.error_validate_year_format), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        val license = binding.licence.text.toString()
+        if (license.isBlank()) {
+            Toast.makeText(this, getString(R.string.error_validate_form, "License"), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        //Valida o formato "ABC-1234"
+        if (license.length != 8 || license[3] != '-') {
+            Toast.makeText(this, getString(R.string.error_validate_license_format), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (binding.imageUrl.text.toString().isBlank()) {
+            Toast.makeText(this, getString(R.string.error_validate_form, "Imagem"), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (selectedMarker == null) {
+            Toast.makeText(this, getString(R.string.error_validate_form_location), Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        return true
     }
 
     private fun uploadImageToFirebase() {
