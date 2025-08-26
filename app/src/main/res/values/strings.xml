@@ -17,4 +17,6 @@
     <string name="erro_create">Erro ao salvar item</string>
     <string name="success_create">Item %1$s adicionado com sucesso!</string>
     <string name="erro_ao_buscar_carros">Erro ao buscar carros</string>
+    <string name="esta_aqui">Está aqui</string>
+    <string name="erro_get">Erro ao buscar carro</string>
 </resources>

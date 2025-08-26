@@ -1,5 +1,10 @@
 package com.example.myapitest.model
 
+data class ObjCar(
+    val id: String,
+    val value: Car
+)
+
 data class Car (
     val id: String,
     var imageUrl: String,
