@@ -6,4 +6,6 @@
     <string name="exit">Sair</string>
     <string name="resquest_code">Informe o código de verificação</string>
     <string name="resquest_number">Informe o número do telefone</string>
+    <string name="erro_desconhecido">Erro desconhecido</string>
+    <string name="permissao_de_localizacao_negada">Permissão de localização negada</string>
 </resources>
