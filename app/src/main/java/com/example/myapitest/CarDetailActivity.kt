@@ -9,6 +9,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapitest.databinding.ActivityCarDetailBinding
 import com.example.myapitest.model.Car
+import com.example.myapitest.service.Result
+import com.example.myapitest.service.RetrofitClient
+import com.example.myapitest.service.safeApiCall
+import com.example.myapitest.ui.loadUrl
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -19,11 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.example.myapitest.service.Result
-import com.example.myapitest.service.RetrofitClient
-import com.example.myapitest.service.safeApiCall
-import com.example.myapitest.ui.loadUrl
-import kotlin.toString
 
 class CarDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 

@@ -136,7 +136,7 @@ class NewCarActivity : AppCompatActivity(), OnMapReadyCallback {
                 position.latitude,
                 position.longitude
             )
-        } ?: throw IllegalArgumentException("Usuário deveria ter selecionado uma localização")
+        } ?: throw IllegalArgumentException(getString(R.string.precisa_validar))
 
         val id = SecureRandom().nextInt().toString()
 
@@ -150,7 +150,7 @@ class NewCarActivity : AppCompatActivity(), OnMapReadyCallback {
         )
 
         CoroutineScope(Dispatchers.IO).launch {
-            var result = safeApiCall {
+            val result = safeApiCall {
                 RetrofitClient.apiService.postCar(car)
             }
             withContext(Dispatchers.Main) {

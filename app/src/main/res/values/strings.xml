@@ -27,4 +27,5 @@
     <string name="erro_update">Erro ao atualizar o carro</string>
     <string name="success_delete">Carro excluido com sucesso</string>
     <string name="erro_delete">Erro ao excluir carro</string>
+    <string name="precisa_validar">Usuário deveria ter selecionado uma localização</string>
 </resources>
