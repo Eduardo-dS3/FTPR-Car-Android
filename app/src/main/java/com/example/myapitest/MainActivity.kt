@@ -136,9 +136,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
         fusedLocationProviderClient.lastLocation.addOnCompleteListener { task: Task<Location> ->
-            if(task.isSuccessful){
+            if (task.isSuccessful) {
                 val location = task.result
-                Log.d("Hello World", "Lat: ${location.latitude} Long: ${location.longitude}")
+                if (location != null) {
+                    Log.d("Hello World", "Lat: ${location.latitude} Long: ${location.longitude}")
+                }
             } else {
                 Toast.makeText(this, R.string.erro_desconhecido, Toast.LENGTH_SHORT).show()
             }

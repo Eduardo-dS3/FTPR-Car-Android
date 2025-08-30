@@ -23,6 +23,7 @@ import com.example.myapitest.service.Result
 import com.example.myapitest.service.RetrofitClient
 import com.example.myapitest.service.safeApiCall
 import com.example.myapitest.ui.loadUrl
+import kotlin.toString
 
 class CarDetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -56,6 +57,91 @@ class CarDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.toolbar.setNavigationOnClickListener{
             finish()
         }
+        binding.editCTA.setOnClickListener {
+            editCar()
+        }
+        binding.deleteCTA.setOnClickListener {
+            deleteCar()
+        }
+    }
+
+    private fun deleteCar(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall {
+                RetrofitClient.apiService.deleteCar(car.id)
+            }
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Result.Success -> {
+                        Toast.makeText(
+                            this@CarDetailActivity,
+                            getString(R.string.success_delete),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    }
+                    is Result.Error -> {
+                        Toast.makeText(
+                            this@CarDetailActivity,
+                            getString(R.string.erro_delete),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun editCar(){
+        if (!validateForm()) {
+            return
+        }
+
+        updateCar()
+    }
+
+    private fun updateCar(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall {
+                RetrofitClient.apiService.updateCar(
+                    car.id,
+                    car.copy(licence = binding.licence.text.toString())
+                )
+            }
+            withContext(Dispatchers.Main){
+                when(result){
+                    is Result.Success -> {
+                        Toast.makeText(
+                            this@CarDetailActivity,
+                            getString(R.string.success_update),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    }
+                    is Result.Error -> {
+                        Toast.makeText(
+                            this@CarDetailActivity,
+                            getString(R.string.erro_update),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateForm(): Boolean {
+        val license = binding.licence.text.toString()
+        if (license.isBlank()) {
+            Toast.makeText(this, getString(R.string.error_validate_form, "License"), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        //Valida o formato "ABC-1234"
+        if (license.length != 8 || license[3] != '-') {
+            Toast.makeText(this, getString(R.string.error_validate_license_format), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
     }
 
     private fun setupGoogleMap() {
